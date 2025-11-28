@@ -12,7 +12,12 @@ class MyVector{
     public:
         MyVector() = default;
 
-        ~MyVector();
+        MyVector(MyVector&& other) noexcept; 
+        MyVector& operator=(MyVector&& other) noexcept; 
+        MyVector(const MyVector&) = delete; 
+        MyVector& operator=(const MyVector&) = delete;
+
+        ~MyVector();    
         void push_back(const T& value);
         size_t size() const {return size_;}
         size_t capacity() const {return capacity_;}
@@ -57,6 +62,36 @@ void MyVector<T>::push_back(const T& value){
 
     size_++;
 }
+
+
+template <typename T>
+MyVector<T>::MyVector(MyVector&& other) noexcept :
+    data_(other.data_),
+    size_(other.size_),
+    capacity_(other.capacity_) 
+{
+    
+    other.data_ = nullptr;
+    other.size_ = 0;
+    other.capacity_ = 0;
+}
+
+template <typename T>
+MyVector<T>& MyVector<T>::operator=(MyVector&& other) noexcept {
+    if (this != &other) {
+        delete[] data_;
+
+        data_ = other.data_;
+        size_ = other.size_;
+        capacity_ = other.capacity_;
+
+        other.data_ = nullptr;
+        other.size_ = 0;
+        other.capacity_ = 0;
+    }
+    return *this;
+}
+
 
 template <typename T>
 T& MyVector<T>::operator[](size_t index){
